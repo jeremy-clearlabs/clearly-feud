@@ -1,50 +1,50 @@
-// import { Link } from 'react-router-dom';
-import data from '../data';
-import useGameController, {
-  TEAM_ONE,
-  TEAM_TWO,
-} from '../hooks/useGameController';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { useGameControllerContext } from '../context/GameControllerContext';
 
 const COLUMN_SIZE = 4;
 
 function GamePage() {
+  const navigate = useNavigate();
   const {
+    index,
     round,
     question,
     answers,
-    currentTeam,
     team1,
     team2,
+    boardScore,
+    outstandingPoints,
     nextRound,
-    setCurrentTeam,
-    teamOneScore,
-    teamTwoScore,
-  } = useGameController(data);
-  const scoreForTeam = (index) => {
-    if (currentTeam === TEAM_ONE) {
-      teamOneScore(index);
-    } else if (currentTeam === TEAM_TWO) {
-      teamTwoScore(index);
+    revealAnswer,
+    awardTeamOne,
+    awardTeamTwo,
+  } = useGameControllerContext();
+
+  useEffect(() => {
+    if (round < index + 1) {
+      navigate('/final-score');
     }
-  };
-  const toggleSelectedTeam = () => {
-    if (currentTeam === TEAM_ONE) {
-      setCurrentTeam(TEAM_TWO);
-    } else if (currentTeam === TEAM_TWO) {
-      setCurrentTeam(TEAM_ONE);
-    }
-  };
+  }, [index, round, navigate]);
+
   return (
     <div className="App">
       <header className="">
         <h1 className="text-3xl font-bold underline">Game Round: {round}</h1>
       </header>
-      <main class="Main">
+      <main className="Main">
+        <div className="score" id="boardScore">
+          {boardScore}
+        </div>
         <h2 className="questionHolder">{question}</h2>
+        <div className="score" id="team1">
+          {team1.score}
+        </div>
         <ul className="AnswerList flex list-disc gap-4">
           <li className="GameCol1 flex flex-col gap-1">
             {answers.slice(0, COLUMN_SIZE).map((answer, index) => (
-              <li
+              <div
                 className="GameButton flex justify-center items-center"
                 key={index.toString()}
               >
@@ -58,17 +58,17 @@ function GamePage() {
                 ) : (
                   <button
                     className="rounded flex-auto h-12"
-                    onClick={() => scoreForTeam(index)}
+                    onClick={() => revealAnswer(index)}
                   >
                     {index + 1}
                   </button>
                 )}
-              </li>
+              </div>
             ))}
           </li>
           <li className="GameCol2 flex flex-col gap-1">
             {answers.slice(COLUMN_SIZE).map((answer, index) => (
-              <li
+              <div
                 className="GameButton flex justify-center items-center"
                 key={index.toString()}
               >
@@ -82,15 +82,47 @@ function GamePage() {
                 ) : (
                   <button
                     className="rounded flex-auto h-12"
-                    onClick={() => scoreForTeam(index + COLUMN_SIZE)}
+                    onClick={() => revealAnswer(index + COLUMN_SIZE)}
                   >
                     {index + 1 + COLUMN_SIZE}
                   </button>
                 )}
-              </li>
+              </div>
             ))}
           </li>
         </ul>
+        <div className="score" id="team2">
+          {team2.score}
+        </div>
+        <div className="btnHolder">
+          <button
+            className="GameButton rounded-pill w-24 "
+            onClick={() => awardTeamOne()}
+          >
+            Award Team One
+          </button>
+          {answers.every((answer) => answer.revealed) ? (
+            <button
+              className="GameButton rounded-pill w-24 "
+              onClick={() => nextRound(round)}
+            >
+              Next Round
+            </button>
+          ) : (
+            <button
+              className="GameButton rounded-pill w-24 "
+              onClick={() => nextRound(round)}
+            >
+              New Round
+            </button>
+          )}
+          <button
+            className="GameButton rounded-pill w-24 "
+            onClick={() => awardTeamTwo()}
+          >
+            Award Team Two
+          </button>
+        </div>
       </main>
       <footer>
         {answers.every((answer) => answer.revealed) && (
@@ -102,20 +134,7 @@ function GamePage() {
           </button>
         )}
         <section>
-          <div>Scores:</div>
-          <ul>
-            <li className="flex">
-              <div>Team One:&nbsp;</div>
-              <div>{team1.score}</div>
-            </li>
-            <li className="flex">
-              <div>Team Two:&nbsp;</div>
-              <div>{team2.score}</div>
-            </li>
-          </ul>
-        </section>
-        <section onClick={toggleSelectedTeam}>
-          Current Team: {currentTeam}
+          <div>Outstanding Points: {outstandingPoints}</div>
         </section>
       </footer>
     </div>

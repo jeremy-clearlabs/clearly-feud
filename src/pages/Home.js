@@ -10,6 +10,7 @@ function HomePage() {
         <Link to="game">
           <button>New Game</button>
         </Link>
+        <audio src="/theme.mp3" autoPlay loop controls/>
       </header>
     </div>
   );

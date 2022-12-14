@@ -2,20 +2,21 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import { useGameControllerContext } from "../context/GameControllerContext";
-import { TEAM_ONE } from "../hooks/useGameController";
+import { TEAM_ONE, TEAM_TWO } from "../hooks/useGameController";
 
 function GamePage() {
   const navigate = useNavigate();
   const {
     currentTeam,
-    fastMoneyScoreTeamOne,
-    fastMoneyScoreTeamTwo,
-    fastMoneyScore,
+    evaluateAnswersFirst,
+    evaluateAnswersSecond,
     fastMoneyAnswersFirst,
     fastMoneyAnswersSecond,
     fastMoneyQuestions,
-    evaluateAnswersFirst,
-    evaluateAnswersSecond,
+    fastMoneyScore,
+    fastMoneyScoreTeamOne,
+    fastMoneyScoreTeamTwo,
+    setCurrentTeam,
   } = useGameControllerContext();
 
   const currentTeamToString = () => {
@@ -100,9 +101,15 @@ function GamePage() {
         <div className="btnHolder">
           <button
             className="GameButton rounded-pill w-24 "
-            onClick={() => fastMoneyScoreTeamOne()}
+            onClick={() => {
+              if (currentTeam === TEAM_ONE) {
+                fastMoneyScoreTeamOne();
+              } else {
+                fastMoneyScoreTeamTwo();
+              }
+            }}
           >
-            Award Team One
+            Award {currentTeamToString()}
           </button>
           <button
             className="GameButton rounded-pill w-24 "
@@ -110,17 +117,22 @@ function GamePage() {
           >
             Finish Round
           </button>
-          <button
-            className="GameButton rounded-pill w-24 "
-            onClick={() => fastMoneyScoreTeamTwo()}
-          >
-            Award Team Two
-          </button>
         </div>
       </main>
       <footer>
         <section>
-          {/* <div>Outstanding Points: {outstandingPoints}</div> */}
+          <button
+            className="rounded-pill w-32"
+            onClick={() => {
+              if (currentTeam === TEAM_ONE) {
+                setCurrentTeam(TEAM_TWO);
+              } else {
+                setCurrentTeam(TEAM_ONE);
+              }
+            }}
+          >
+            Toggle Teams
+          </button>
         </section>
       </footer>
     </div>

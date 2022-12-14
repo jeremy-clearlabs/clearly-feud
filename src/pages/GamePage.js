@@ -10,6 +10,7 @@ function GamePage() {
   const {
     index,
     round,
+    type,
     question,
     answers,
     team1,
@@ -27,6 +28,13 @@ function GamePage() {
       navigate('/final-score');
     }
   }, [index, round, navigate]);
+
+  // Navigate to the fast money game page
+  useEffect(() => {
+    if (type === 'fast-money') {
+      navigate('/fast-money');
+    }
+  }, [type, navigate])
 
   return (
     <div className="App">
